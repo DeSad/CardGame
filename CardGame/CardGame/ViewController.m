@@ -7,18 +7,32 @@
 //
 
 #import "ViewController.h"
+#import "PlayingCardDesk.h"
 
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *flipsLabel;
 @property (nonatomic) int flipsCount;
+@property (nonatomic, strong) Desk *desk;
+
 @end
 
 @implementation ViewController
+
 -(void)setFlipsCount:(int)flipsCount{
     _flipsCount = flipsCount;
     self.flipsLabel.text = [NSString stringWithFormat:@"Flips: %d", self.flipsCount];
     NSLog(@"flipCount changed to %d", self.flipsCount);
 }
+
+-(Desk *)desk{
+    if (!_desk)_desk = [self createDesk];
+    return _desk;
+}
+
+-(Desk *)createDesk{
+    return [[PlayingCardDesk alloc] init];
+}
+
 - (IBAction)touchCardButton:(UIButton *)sender {
     
     if ([sender.currentTitle length]) {
@@ -26,11 +40,14 @@
                           forState:UIControlStateNormal];
         [sender setTitle:@"" forState:UIControlStateNormal];
     }else{
-        [sender setBackgroundImage:[UIImage imageNamed:@"cardfont"]
-                          forState:UIControlStateNormal];
-        [sender setTitle:@"♣︎" forState:UIControlStateNormal];
+        Card *randomCard = [self.desk drawRandomCard];
+        if (randomCard) {
+            [sender setBackgroundImage:[UIImage imageNamed:@"cardfont"]
+                              forState:UIControlStateNormal];
+            [sender setTitle:randomCard.contents forState:UIControlStateNormal];
+            self.flipsCount++;
+        }
     }
-    self.flipsCount++;
 }
 
 
